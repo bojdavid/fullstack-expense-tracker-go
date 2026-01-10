@@ -73,7 +73,7 @@ func (h *TransactionHandler) DeleteTransaction(w http.ResponseWriter, r *http.Re
 	}
 	json.NewEncoder(w).Encode(payload)
 
-	fmt.Fprint(w, "delete transactions end point")
+	fmt.Println("delete transactions end point")
 }
 
 func (h *TransactionHandler) UpdateTransaction(w http.ResponseWriter, r *http.Request) {

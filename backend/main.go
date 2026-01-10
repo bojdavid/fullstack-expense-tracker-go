@@ -24,9 +24,9 @@ func handleRequest(cfg *config.Config, transRepo *repository.TransactionReposito
 	myRoute.HandleFunc("/register", handlers.RegisternHandler)
 
 	// categories route
-	myRoute.HandleFunc("/add-category", handlers.AddCategory)
-	myRoute.HandleFunc("/delete-category", handlers.DeleteCategories)
-	myRoute.HandleFunc("/update-category", handlers.UpdateCategories)
+	myRoute.HandleFunc("/add-category", catHandler.AddCategory)
+	myRoute.HandleFunc("/delete-category", catHandler.DeleteCategories)
+	myRoute.HandleFunc("/update-category", catHandler.UpdateCategories)
 	myRoute.HandleFunc("/get-categories", catHandler.GetCategories).Methods("GET")
 
 	// transactions  route
