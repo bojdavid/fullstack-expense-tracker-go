@@ -20,14 +20,14 @@ func handleRequest(cfg *config.Config, transRepo *repository.TransactionReposito
 	myRoute := mux.NewRouter().StrictSlash(true)
 	transHandler := handlers.NewTransactionHandler(transRepo)
 	catHandler := handlers.NewCategoryHandler(categoryRepo)
-	authHandler := handlers.NewAuthHandler(userRepo)
+	authHandler := handlers.NewAuthHandler(userRepo, cfg)
 
 	myRoute.HandleFunc("/login", authHandler.LoginHandler).Methods("POST")
 	myRoute.HandleFunc("/register", authHandler.RegisterHandler).Methods("POST")
 
 	// PROTECTED ROUTES
 	api := myRoute.PathPrefix("/api").Subrouter()
-	api.Use(middleware.AuthMiddleware) // Protects everything below
+	api.Use(middleware.AuthMiddleware(cfg.Jwt_Secret)) // Protects everything below
 
 	// categories route
 	api.HandleFunc("/add-category", catHandler.AddCategory)

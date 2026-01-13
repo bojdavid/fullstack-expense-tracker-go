@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"expense-tracker/internal/config"
 	"expense-tracker/internal/models"
 	"expense-tracker/internal/repository"
 	"fmt"
@@ -12,14 +13,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var JwtKey = []byte("your_secret_key_here")
-
 type AuthHandler struct {
 	repo *repository.UserRepository
+	cfg  *config.Config
 }
 
-func NewAuthHandler(repo *repository.UserRepository) *AuthHandler {
-	return &AuthHandler{repo: repo}
+func NewAuthHandler(repo *repository.UserRepository, cfg *config.Config) *AuthHandler {
+	return &AuthHandler{repo: repo, cfg: cfg}
 }
 
 func (u *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +54,8 @@ func (u *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(JwtKey)
+
+		tokenString, err := token.SignedString([]byte(u.cfg.Jwt_Secret))
 		if err != nil {
 			w.WriteHeader(500)
 			return
