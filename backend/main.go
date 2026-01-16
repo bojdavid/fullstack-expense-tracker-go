@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 
 	"expense-tracker/internal/config"
 	"expense-tracker/internal/database"
@@ -41,9 +42,23 @@ func handleRequest(cfg *config.Config, transRepo *repository.TransactionReposito
 	api.HandleFunc("/add-transactions", transHandler.AddTransaction).Methods("POST")
 	api.HandleFunc("/get-transactions", transHandler.GetTransaction).Methods("GET")
 
-	fmt.Printf("Server running on port %s\n", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, myRoute))
+	// --- CORS IMPLEMENTATION START ---
+	c := cors.New(cors.Options{
+		// Allow all origins for development.
+		//AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: false, // Must be false if AllowedOrigins is "*"
+		Debug:            false,
+	})
 
+	// Wrap the entire router with the CORS middleware
+	handler := c.Handler(myRoute)
+	// --- CORS IMPLEMENTATION END ---
+	fmt.Printf("Server running on port %s\n", cfg.Port)
+	// IMPORTANT: Pass 'handler' (with CORS) instead of 'myRoute'
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, handler))
 }
 
 func main() {

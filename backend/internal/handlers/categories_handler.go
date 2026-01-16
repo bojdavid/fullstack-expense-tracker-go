@@ -107,13 +107,14 @@ func (c *CategoryHandler) AddCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	_, err_ := c.repo.AddCategory(response.Data)
+	newCategory, err_ := c.repo.AddCategory(response.Data)
 	if err_ != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		response.Message = err_.Error()
 	} else {
 		response.Message = "Category Added Successfully"
 		w.WriteHeader(201)
+		response.Data = newCategory
 	}
 
 	json.NewEncoder(w).Encode(response)

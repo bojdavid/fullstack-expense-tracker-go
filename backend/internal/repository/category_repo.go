@@ -5,6 +5,8 @@ import (
 	"errors"
 	"expense-tracker/internal/models"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type CategoryRepository struct {
@@ -105,12 +107,24 @@ func (c *CategoryRepository) UpdateCategories(category models.Category) (models.
 }
 
 func (c *CategoryRepository) AddCategory(category models.Category) (models.Category, error) {
-	query := `INSERT INTO categories(id, user_id, name, type, is_default) VALUES (UUID(), ?, ?, ?, ?)`
+	// Generate a new UUID for the category
+	newID := uuid.New().String()
+	query := `INSERT INTO categories(id, user_id, name, type, is_default) VALUES (?, ?, ?, ?, ?)`
 
-	_, err := c.db.Exec(query, category.UserID, category.Name, category.Type, category.IsDefault)
+	_, err := c.db.Exec(query, newID, category.UserID, category.Name, category.Type, category.IsDefault)
 	if err != nil {
 		return category, err
 	}
+	//category.ID = newID
+	//construct a new category object to return
+	newCategory := models.Category{
+		ID:        newID,
+		UserID:    category.UserID,
+		Name:      category.Name,
+		Type:      category.Type,
+		IsDefault: category.IsDefault,
+		//CreatedAt:   time.Now(),
+	}
 
-	return category, nil
+	return newCategory, nil
 }

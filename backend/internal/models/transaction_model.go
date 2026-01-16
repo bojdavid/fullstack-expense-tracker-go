@@ -23,6 +23,16 @@ type Transaction struct {
 	CreatedAt   time.Time       `json:"createdAt" db:"created_at"`
 }
 
+type TransactionPayload struct {
+	UserID      string          `json:"userId" db:"user_id"`
+	CategoryID  string          `json:"categoryId" db:"category_id"`
+	Type        TransactionType `json:"type" db:"type"`
+	Amount      float64         `json:"amount" db:"amount"`
+	Date        *time.Time      `json:"date" db:"date"`
+	Note        *string         `json:"note" db:"note"` // Pointer allows null in JSON
+	Description *string         `json:"description" db:"description"`
+}
+
 type TransactionResponse struct {
 	Total        int `json:"total"`
 	Transactions []Transaction

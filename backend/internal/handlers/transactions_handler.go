@@ -6,7 +6,6 @@ import (
 	"expense-tracker/internal/repository"
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
 type TransactionHandler struct {
@@ -19,15 +18,7 @@ func NewTransactionHandler(repo *repository.TransactionRepository) *TransactionH
 
 func (h *TransactionHandler) GetTransaction(w http.ResponseWriter, r *http.Request) {
 	// 1. Extract query parameters (e.g., /transactions?userId=1)
-	userIDStr := r.URL.Query().Get("userId")
-
-	// 2. Convert the string ID to an integer (Go is strict about types!)
-	userID, err := strconv.Atoi(userIDStr)
-	if err != nil {
-		// If the ID isn't a number, send a 400 Bad Request
-		http.Error(w, "Invalid User ID format", http.StatusBadRequest)
-		return
-	}
+	userID := r.URL.Query().Get("userId")
 
 	// 3. Ask the repository to get the data.
 	transactions, err := h.repo.GetTransactionByUserID(userID)
@@ -56,7 +47,7 @@ func (h *TransactionHandler) DeleteTransaction(w http.ResponseWriter, r *http.Re
 	err := json.NewDecoder(r.Body).Decode(&payload.Data)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid JSON"})
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		fmt.Println(err.Error())
 		return
 	}
@@ -84,7 +75,7 @@ func (h *TransactionHandler) UpdateTransaction(w http.ResponseWriter, r *http.Re
 	err := json.NewDecoder(r.Body).Decode(&transactionData.Data)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid JSON"})
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 	defer r.Body.Close()
@@ -109,16 +100,17 @@ func (h *TransactionHandler) AddTransaction(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", "application/json")
 
 	var transactionData models.AddTransactionResponse
+	var payload models.TransactionPayload
 
-	err := json.NewDecoder(r.Body).Decode(&transactionData.Data)
+	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid JSON"})
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 	defer r.Body.Close()
 
-	transaction, err := h.repo.AddTransactionByUserID(transactionData.Data)
+	transaction, err := h.repo.AddTransactionByUserID(payload)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

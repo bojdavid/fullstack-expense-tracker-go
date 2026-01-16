@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+    /* Colors */
+    --primary: #e2e8f0;
+    /* Indigo-500 */
+    --secondary: #1e293b;
+    /* Slate-800 */
+    --tetiary: #6366f1;
+    /* Slate-200 */
+    --tetiary2: #0f172a;
+    /* Slate-900 */
+    --border: #4f46e5;
+    /* Indigo-600 */
+    --text: #e2e8f0;
+
+    /* Gray-900 */
+    --subtext: #6b7280;
+    /* Gray-500 */
+    --success: #22c55e;
+    /* Green-500 */
+    --error: #ef4444;
+    /* Red-500 */
+    --warning: #f59e0b;
+    /* Amber-500 */
+
+    /* Typography: Headings (fs = font-size) */
+    /* Using consistent clamp scaling logic */
+    --fs-h1: clamp(1.4rem, 0.4114rem + 3.2472vw, 6.5rem);
+
+    --fs-h2: clamp(1.5rem, 0.8571rem + 2.7429vw, 5rem);
+
+    --fs-h3: clamp(1.25rem, 0.6286rem + 2.6514vw, 3.5rem);
+
+    --fs-h4: clamp(1.1rem, 0.5rem + 2vw, 2.5rem);
+
+    --fs-h5: clamp(1rem, 0.4rem + 1.5vw, 1.8rem);
+
+    /* Typography: Body */
+    --fs-b1: clamp(1.125rem, 0.9rem + 0.5vw, 1.3rem);
+
+    --fs-b2: clamp(1rem, 0.8rem + 0.5vw, 1.125rem);
+
+    --fs-b3: clamp(0.875rem, 0.7rem + 0.4vw, 1rem);
+
+    /* Spacing (1 = largest, 5 = smallest) */
+    /* M1/P1 approx 4rem-8rem scaling */
+    --spacing-1: clamp(4rem, 2rem + 5vw, 8rem);
+    --spacing-2: clamp(2rem, 1rem + 3vw, 4rem);
+    --spacing-3: clamp(1.5rem, 0.75rem + 1.5vw, 2.5rem);
+    --spacing-4: clamp(1rem, 0.5rem + 1vw, 1.5rem);
+    --spacing-5: clamp(0.5rem, 0.25rem + 0.5vw, 1rem);
+}
+
+@theme {
+    /* Colors */
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tetiary: var(--tetiary);
+    --color-tetiary2: var(--tetiary2);
+    --color-border: var(--border);
+    --color-text-main: var(--text);
+    --color-subtext: var(--subtext);
+    --color-success: var(--success);
+    --color-error: var(--error);
+    --color-warning: var(--warning);
+
+    /* Font Sizes */
+    --text-h1: var(--fs-h1);
+    --text-h2: var(--fs-h2);
+    --text-h3: var(--fs-h3);
+    --text-h4: var(--fs-h4);
+    --text-h5: var(--fs-h5);
+
+    --text-b1: var(--fs-b1);
+    --text-b2: var(--fs-b2);
+    --text-b3: var(--fs-b3);
+
+    /* Spacing - Mapping to custom utilities if needed or extending spacing */
+    /* Note: Tailwind spacing is usually number based (p-4), but we can add bespoke semantic spacing */
+    --spacing-p1: var(--spacing-1);
+    --spacing-p2: var(--spacing-2);
+    --spacing-p3: var(--spacing-3);
+    --spacing-p4: var(--spacing-4);
+    --spacing-p5: var(--spacing-5);
+
+    --spacing-m1: var(--spacing-1);
+    --spacing-m2: var(--spacing-2);
+    --spacing-m3: var(--spacing-3);
+    --spacing-m4: var(--spacing-4);
+    --spacing-m5: var(--spacing-5);
+}
+
+/* Global resets/base styles using new variables */
+body {
+    background-color: var(--secondary);
+    color: var(--tetiary);
+    font-family: system-ui, -apple-system, sans-serif;
+}

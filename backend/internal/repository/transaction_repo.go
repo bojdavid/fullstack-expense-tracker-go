@@ -5,6 +5,9 @@ import (
 	"errors"
 	"expense-tracker/internal/models"
 	"fmt"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type TransactionRepository struct {
@@ -16,7 +19,7 @@ func NewTransactionRepository(db *sql.DB) *TransactionRepository {
 	return &TransactionRepository{db: db}
 }
 
-func (r *TransactionRepository) GetTransactionByUserID(userID int) ([]models.Transaction, error) {
+func (r *TransactionRepository) GetTransactionByUserID(userID string) ([]models.Transaction, error) {
 	// 1. Define the SQL query. We use '?' as placeholders to prevent SQL Injection.
 	query := `SELECT id, user_id, category_id, type, amount, date, note, description, created_at
               FROM transactions WHERE user_id = ?`
@@ -64,17 +67,34 @@ func (r *TransactionRepository) GetTransactionByUserID(userID int) ([]models.Tra
 	return transactions, nil
 }
 
-func (r *TransactionRepository) AddTransactionByUserID(t models.Transaction) (models.Transaction, error) {
-	query := `INSERT INTO transactions (id, user_id, category_id, type, amount, date, note, description) 
-              VALUES (UUID(),?, ?, ?, ?, ?, ?, ?)`
+func (r *TransactionRepository) AddTransactionByUserID(t models.TransactionPayload) (models.Transaction, error) {
+	// Generate a new UUID for the transaction
+	newID := uuid.New().String()
 
-	_, err := r.db.Exec(query, t.UserID, t.CategoryID, t.Type, t.Amount, t.Date, t.Note, t.Description)
+	query := `INSERT INTO transactions (id, user_id, category_id, type, amount, date, note, description) 
+              VALUES (?,?, ?, ?, ?, ?, ?, ?)`
+
+	_, err := r.db.Exec(query, newID, t.UserID, t.CategoryID, t.Type, t.Amount, t.Date, t.Note, t.Description)
 	if err != nil {
-		// Return an empty transaction and the error
 		return models.Transaction{}, err
 	}
 
-	return t, nil
+	// Construct the full transaction object to return
+	newTransaction := models.Transaction{
+		ID:          newID,
+		UserID:      t.UserID,
+		CategoryID:  t.CategoryID,
+		Type:        t.Type,
+		Amount:      t.Amount,
+		Date:        t.Date,
+		Note:        t.Note,
+		Description: t.Description,
+		CreatedAt:   time.Now(),
+		// CreatedAt is handled by DB default usually, but we can't easily get it back without a SELECT.
+		// For now, let's leave it zero-valued or set to time.Now() if critical.
+	}
+
+	return newTransaction, nil
 
 	// Use QueryRow instead of Exec to capture the returned ID
 

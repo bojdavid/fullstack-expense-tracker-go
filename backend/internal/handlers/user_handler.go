@@ -34,12 +34,15 @@ func (u *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data, err := u.repo.GetUserByEmail(payload.Email)
-	err_hash := bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(payload.Password))
 
 	if err != nil {
 		w.WriteHeader(500)
-		response.Message = err.Error()
-	} else if err_hash != nil {
+		response.Message = "Invalid email or password"
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+	err_hash := bcrypt.CompareHashAndPassword([]byte(data.Password), []byte(payload.Password))
+	if err_hash != nil {
 		response.Message = err_hash.Error()
 		w.WriteHeader(401)
 	} else {
@@ -77,7 +80,7 @@ func (u *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&response.Data)
 	if err != nil {
 		w.WriteHeader(500)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid jsonxżxz"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid json format"})
 		return
 	}
 
@@ -90,11 +93,12 @@ func (u *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	err_ := u.repo.CreateNewUser(response.Data)
 	if err_ != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusBadRequest)
 		response.Message = err_.Error()
 	} else {
 		response.Message = "User created successfully"
-		w.WriteHeader(201)
+		response.Status = true
+		w.WriteHeader(http.StatusCreated)
 	}
 
 	json.NewEncoder(w).Encode(response)
