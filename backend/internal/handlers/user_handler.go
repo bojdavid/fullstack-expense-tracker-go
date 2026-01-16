@@ -49,6 +49,7 @@ func (u *AuthHandler) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// 3. Generate JWT
 		expirationTime := time.Now().Add(24 * time.Hour)
+		//expirationTime := time.Now().Add(30 * time.Second)
 		claims := &models.MyCustomClaims{
 			UserID: data.ID,
 			RegisteredClaims: jwt.RegisteredClaims{

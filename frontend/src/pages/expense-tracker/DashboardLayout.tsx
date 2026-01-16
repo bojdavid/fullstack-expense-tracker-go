@@ -1,24 +1,39 @@
 import React, { useEffect } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { LayoutDashboard, Receipt, Tags, LogOut, Plus, Menu, X } from 'lucide-react';
 import { useModalStore } from '../../store/useModalStore';
 import Button from '../../lib/components/common/Button';
+import { authApi } from '../../api/auth.api';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardLayout: React.FC = () => {
+    const navigate = useNavigate();
     const { user, logout, isAuthenticated } = useAuthStore();
     const { openModal } = useModalStore();
     const location = useLocation();
-    const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
+    // Heartbeat to detect session expiration (since backend token is short-lived for testing)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (isAuthenticated && !authApi.isAuthenticated()) {
+                openModal('SESSION_EXPIRED', {}, 'Session Expired');
+                logout();
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [isAuthenticated, logout]);
+
+    /*
     useEffect(() => {
         if (!isAuthenticated) {
+            openModal('SESSION_EXPIRED', {}, 'Session Expired');
             navigate('/login');
         }
-    }, [isAuthenticated, navigate]);
-
-    if (!isAuthenticated) return null;
+    }, [isAuthenticated, openModal]);
+*/
+    if (!isAuthenticated) navigate('/login');
 
     const navItems = [
         { label: 'Overview', path: '/dashboard', icon: <LayoutDashboard size={20} /> },

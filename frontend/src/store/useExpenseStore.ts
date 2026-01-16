@@ -35,11 +35,7 @@ export const useExpenseStore = create<ExpenseState>((set, get) => ({
                 transactionsApi.getTransactions(),
                 categoriesApi.getCategories(),
             ]);
-            console.log("Store fetchData - categories received:", categories);
-            console.log("Store fetchData - categories type:", typeof categories);
-            console.log("Store fetchData - categories is array:", Array.isArray(categories));
             set({ transactions, categories, isLoading: false });
-            console.log("Store fetchData - after set, current state:", get().categories);
         } catch (err) {
             console.error("Store fetchData - error:", err);
             set({ error: (err as Error).message, isLoading: false });

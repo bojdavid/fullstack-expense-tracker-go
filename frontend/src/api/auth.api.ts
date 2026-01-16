@@ -1,4 +1,5 @@
-import { apiClient, setAuthToken, clearAuthData, getUserData, setUserData, AUTH_TOKEN_KEY } from './client';
+import { apiClient, clearAuthData, getUserData, setUserData, AUTH_TOKEN_KEY } from './client';
+import Cookies from 'js-cookie';
 
 export interface User {
     id: string;
@@ -21,9 +22,6 @@ interface RegisterResponse {
 }
 
 export const authApi = {
-    /**
-     * Register a new user
-     */
     async signup(user: Omit<User, 'id'>): Promise<User> {
         const response = await apiClient.post<RegisterResponse>('/register', user, false);
 
@@ -33,10 +31,6 @@ export const authApi = {
 
         return response.data;
     },
-
-    /**
-     * Login user and get JWT token
-     */
     async login(email: string, password: string): Promise<User> {
         const response = await apiClient.post<LoginResponse>('/login', { email, password }, false);
 
@@ -44,12 +38,20 @@ export const authApi = {
             throw new Error(response.message || 'Login failed');
         }
 
-        // Store the JWT token
-        setAuthToken(response.token);
-
-        // Decode the JWT to extract user_id (basic decode - no verification needed on client)
+        // Decode the JWT to get expiration (exp) and user_id
         const payload = JSON.parse(atob(response.token.split('.')[1]));
         const userId = payload.user_id;
+        const expiryTimestamp = payload.exp; // JWT 'exp' is in seconds
+
+        // Calculate the cookie expiration
+        const expirationDate = new Date(expiryTimestamp * 1000);
+
+        // Store the JWT in a Cookie
+        Cookies.set('auth_token', response.token, {
+            expires: expirationDate,
+            secure: true,       // Only send over HTTPS
+            sameSite: 'strict'  // Prevent CSRF
+        });
 
         // Store user data for later use
         setUserData({ userId });
@@ -62,16 +64,11 @@ export const authApi = {
         };
     },
 
-    /**
-     * Logout - clear stored auth data
-     */
     async logout(): Promise<void> {
         clearAuthData();
+        Cookies.remove('auth_token');
     },
 
-    /**
-     * Get current user from stored data
-     */
     getCurrentUser(): User | null {
         const token = localStorage.getItem(AUTH_TOKEN_KEY);
         if (!token) return null;
@@ -91,7 +88,21 @@ export const authApi = {
      * Check if user is authenticated
      */
     isAuthenticated(): boolean {
-        return !!localStorage.getItem(AUTH_TOKEN_KEY);
+        const token = Cookies.get('auth_token');
+
+        // If no cookie, they are definitely not logged in
+        if (!token) return false;
+
+        try {
+            // Optional: Check if the token is expired before saying "true"
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const isExpired = Date.now() >= payload.exp * 1000;
+
+            return !isExpired;
+        } catch (e) {
+            return false;
+        }
+        //  return !!localStorage.getItem(AUTH_TOKEN_KEY);
     },
 
     /**

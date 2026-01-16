@@ -3,11 +3,13 @@ import { useModalStore } from '../../../store/useModalStore';
 import { X } from 'lucide-react';
 
 import TransactionForm from '../expense-tracker/TransactionForm';
+import SessionExpiredModal from '../common/SessionExpiredModal';
 
 // Maps view strings to components (to be populated as we build them)
 const MODAL_COMPONENTS: Record<string, React.FC<any>> = {
     'ADD_TRANSACTION': TransactionForm,
     'EDIT_TRANSACTION': TransactionForm,
+    'SESSION_EXPIRED': SessionExpiredModal,
     // 'MANAGE_CATEGORIES': CategoryManager,
 };
 

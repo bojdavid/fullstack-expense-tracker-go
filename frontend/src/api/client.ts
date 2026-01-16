@@ -3,6 +3,7 @@
  */
 
 import axios, { AxiosError } from 'axios';
+import Cookies from 'js-cookie';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
@@ -47,7 +48,7 @@ axiosInstance.interceptors.response.use(
  * Get the stored auth token
  */
 export function getAuthToken(): string | null {
-    return localStorage.getItem(AUTH_TOKEN_KEY);
+    return Cookies.get(AUTH_TOKEN_KEY) || localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
 /**
