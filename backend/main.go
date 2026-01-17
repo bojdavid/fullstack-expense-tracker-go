@@ -42,6 +42,19 @@ func handleRequest(cfg *config.Config, transRepo *repository.TransactionReposito
 	api.HandleFunc("/add-transactions", transHandler.AddTransaction).Methods("POST")
 	api.HandleFunc("/get-transactions", transHandler.GetTransaction).Methods("GET")
 
+	// groups route
+	api.HandleFunc("/get-groups", handlers.GetAllGroups).Methods("GET")
+	api.HandleFunc("/edit-group", handlers.EditGroup).Methods("PUT")
+	api.HandleFunc("/get-group", handlers.GetGroup).Methods("GET")
+	api.HandleFunc("/delete-group", handlers.DeleteGroup).Methods("DELETE")
+	api.HandleFunc("/create-group", handlers.CreateGroup).Methods("POST")
+
+	//group transactions route
+	api.HandleFunc("/get-group-transactions", handlers.GetAllGroupTransactions).Methods("GET")
+	api.HandleFunc("/edit-group-transaction", handlers.EditGroupTransaction).Methods("PUT")
+	api.HandleFunc("/delete-group-transaction", handlers.DeleteGroupTransaction).Methods("DELETE")
+	api.HandleFunc("/add-group-transaction", handlers.AddGroupTransaction).Methods("POST")
+
 	// --- CORS IMPLEMENTATION START ---
 	c := cors.New(cors.Options{
 		// Allow all origins for development.

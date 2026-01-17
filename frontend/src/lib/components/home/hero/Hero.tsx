@@ -1,7 +1,9 @@
 import React from 'react';
 import Button from '../../common/Button';
+import { useNavigate } from 'react-router-dom';
 
 const Hero: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <section className="min-h-[90vh]  flex flex-col items-center justify-center text-center p-p1 relative overflow-hidden">
             {/* Background Gradient Blob */}
@@ -15,8 +17,8 @@ const Hero: React.FC = () => {
             </p>
 
             <div className="flex gap-p4 mt-m3">
-                <Button text="Get Started" mode="light" onClick={() => console.log('Get Started')} />
-                <Button text="Learn More" mode="dark" onClick={() => console.log('Learn More')} />
+                <Button text="Get Started" mode="light" onClick={() => navigate('/signup')} />
+                <Button text="Learn More" mode="dark" onClick={() => navigate('/login')} />
             </div>
         </section>
     );
